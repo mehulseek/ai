@@ -95,3 +95,9 @@ img {
     background-color: #444; /* Darker chat container */
     border: 1px solid #555; /* Darker border */
 }
+
+#welcome-message {
+    text-align: center;
+    margin-top: 30px; /* Increased margin-top */
+    font-size: larger;
+}
