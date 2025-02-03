@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleDarkMode = document.getElementById('dark-mode-toggle');
     
     // Use your server's correct URL
-    const SERVER_URL = '192.168.0.102:3002/ask';
+    const SERVER_URL = 'https://happened-powerseller-flashers-analytical.trycloudflare.com';
 
     micButton.addEventListener('click', () => {
         startRecognition();
