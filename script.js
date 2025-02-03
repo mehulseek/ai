@@ -5,23 +5,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const micButton = document.getElementById('mic');
     const toggleDarkMode = document.getElementById('dark-mode-toggle');
     
-    // Use your server's correct URL
-    const SERVER_URL = 'https://definition-manager-trucks-conviction.trycloudflare.com';
+    // 1. Fixed endpoint URL with /ask route
+    const SERVER_URL = 'https://definition-manager-trucks-conviction.trycloudflare.com/ask';
+
+    // 2. Speech Recognition Safety
+    let isRecognizing = false;
+    let recognition;
 
     micButton.addEventListener('click', () => {
-        startRecognition();
+        if (!isRecognizing) {
+            startRecognition();
+        } else {
+            stopRecognition();
+        }
     });
 
-    // Speech Recognition Function
+    // 3. Robust Speech Recognition
     function startRecognition() {
         if (!('webkitSpeechRecognition' in window)) {
-            alert('Speech recognition not supported');
+            addMessage('System', 'Speech recognition not supported in your browser');
             return;
         }
 
-        const recognition = new webkitSpeechRecognition();
+        recognition = new webkitSpeechRecognition();
         recognition.lang = 'en-US';
         recognition.interimResults = false;
+        recognition.continuous = false;
+
+        recognition.onstart = () => {
+            isRecognizing = true;
+            micButton.style.backgroundColor = '#dc3545';
+        };
 
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
@@ -29,66 +43,110 @@ document.addEventListener('DOMContentLoaded', () => {
             sendMessage(transcript);
         };
 
+        recognition.onerror = (event) => {
+            addMessage('System', 'Error in voice recognition: ' + event.error);
+        };
+
+        recognition.onend = () => {
+            isRecognizing = false;
+            micButton.style.backgroundColor = '#007bff';
+        };
+
         recognition.start();
     }
 
-    // Unified Send Message Function
-    function sendMessage(message) {
+    function stopRecognition() {
+        if (recognition) {
+            recognition.stop();
+        }
+    }
+
+    // 4. Enhanced Error Handling
+    async function sendMessage(message) {
         if (!message.trim()) return;
 
         addMessage('You', message);
         input.value = '';
+        input.disabled = true;
+        sendButton.disabled = true;
 
-        fetch(SERVER_URL, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ query: message })
-        })
-        .then(response => {
+        try {
+            const response = await fetch(SERVER_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ question: message }) // 5. Fixed parameter name to match server
+            });
+
             if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(`Server error: ${err.message}`);
-                });
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Server response error');
             }
-            return response.json();
-        })
-        .then(data => {
+
+            const data = await response.json();
             addMessage('Mseek', data.answer);
             readAloud(data.answer);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            addMessage('Error', 'Failed to get response');
-        });
+
+        } catch (error) {
+            addMessage('System', `Error: ${error.message}`);
+            console.error('API Error:', error);
+        } finally {
+            input.disabled = false;
+            sendButton.disabled = false;
+            input.focus();
+        }
     }
 
-    // Event Listeners
+    // 6. Event Listeners with Debouncing
     sendButton.addEventListener('click', () => {
-        sendMessage(input.value.trim());
+        const message = input.value.trim();
+        if (message) sendMessage(message);
     });
 
-    // Dark Mode Toggle Functionality
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            const message = input.value.trim();
+            if (message) sendMessage(message);
+        }
+    });
+
+    // 7. Safe Dark Mode Toggle
     toggleDarkMode.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
-        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode);
+        toggleDarkMode.textContent = isDarkMode ? '☀️' : '🌙';
     });
 
-    // Apply dark mode if previously enabled
+    // Initialize Dark Mode
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark-mode');
+        toggleDarkMode.textContent = '☀️';
     }
 
-    // Helper Functions
+    // 8. UI Helpers with Safety Checks
     function addMessage(sender, text) {
         const div = document.createElement('div');
-        div.textContent = `${sender}: ${text}`;
+        div.innerHTML = `<strong>${sender}:</strong> ${safeText(text)}`;
+        div.classList.add('message');
         messages.appendChild(div);
         messages.scrollTop = messages.scrollHeight;
     }
 
+    function safeText(text) {
+        return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // 9. Speech Synthesis with Error Handling
     function readAloud(text) {
         if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(text);
+            const utterance = new SpeechSynthesisUtterance();
+            utterance.text = text.substring(0, 300); // Limit length
+            utterance.rate = 1;
+            utterance.onerror = (event) => {
+                console.error('Speech Error:', event.error);
+            };
+            speechSynthesis.cancel();
             speechSynthesis.speak(utterance);
         }
     }
