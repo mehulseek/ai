@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const micButton = document.getElementById('mic');
     const toggleDarkMode = document.getElementById('dark-mode-toggle');
     
-    // Use your server's IP:PORT
-    const SERVER_URL = 'https://ai-umy6.onrender.com';
+    // Use your server's correct URL
+    const SERVER_URL = 'https://ai-umy6.onrender.com/ask';
 
     micButton.addEventListener('click', () => {
         startRecognition();
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch(SERVER_URL, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ question: message })
+            body: JSON.stringify({ query: message })
         })
         .then(response => {
             if (!response.ok) {
