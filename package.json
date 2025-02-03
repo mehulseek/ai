@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "node-fetch": "^2.7.0",
+    "openai": "^4.82.0"
+  }
+}
