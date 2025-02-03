@@ -3,7 +3,7 @@ import express from "express";
 
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
-  apiKey: "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",
+  apiKey: "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",
   defaultHeaders: {
     "HTTP-Referer": "<YOUR_SITE_URL>",
     "X-Title": "<YOUR_SITE_NAME>",
