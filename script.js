@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleDarkMode = document.getElementById('dark-mode-toggle');
     
     // Use your server's correct URL
-    const SERVER_URL = 'https://ai-1-f7nj.onrender.com/ask';
+    const SERVER_URL = '192.168.0.102:3002/ask';
 
     micButton.addEventListener('click', () => {
         startRecognition();
