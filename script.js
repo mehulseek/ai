@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleDarkMode = document.getElementById('dark-mode-toggle');
 
     // OpenRouter API Key (replace with your actual API key)
-    const OPENROUTER_API_KEY = "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";
+    const OPENROUTER_API_KEY = "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";
 
     // Custom responses
     const CUSTOM_RESPONSES = {
