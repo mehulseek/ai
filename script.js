@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleDarkMode = document.getElementById('dark-mode-toggle');
     
     // 1. Fixed endpoint URL with /ask route
-    const SERVER_URL = 'https://parent-affiliated-bringing-vpn.trycloudflare.com/ask';
+    const SERVER_URL = 'https://casio-shower-problems-aggressive.trycloudflare.com/ask';
 
     // 2. Speech Recognition Safety
     let isRecognizing = false;
