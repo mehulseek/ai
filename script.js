@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             readAloud(data.answer);
 
         } catch (error) {
-            addMessage('System', Error: ${error.message});
+            addMessage('System', `Error: ${error.message}`);
             console.error('API Error:', error);
         } finally {
             input.disabled = false;
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 8. UI Helpers with Safety Checks
     function addMessage(sender, text) {
         const div = document.createElement('div');
-        div.innerHTML = <strong>${sender}:</strong> ${safeText(text)};
+        div.innerHTML = `<strong>${sender}:</strong> ${safeText(text)}`;
         div.classList.add('message');
         messages.appendChild(div);
         messages.scrollTop = messages.scrollHeight;
